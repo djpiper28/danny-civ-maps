@@ -183,12 +183,6 @@ function TerrainGenerator:GetLatitudeAtPlot(iX, iY)
 	local lat = math.abs((self.iHeight / 2) - iY) / (self.iHeight / 2);
 	lat = lat + (128 - self.variation:GetHeight(iX, iY))/(255.0 * 5.0);
 	lat = 0.8 * (math.clamp(lat, 0, 1));
-
-	local iW, iH = Map.GetGridSize();
-  if iX == 0 or x == iW -1 or iY == 0 or iY == iH -1 then
-    lat = 128.0;
-  end
-
 	return lat;
 end
 ----------------------------------------------------------------------------------
