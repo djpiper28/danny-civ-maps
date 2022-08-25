@@ -11,6 +11,7 @@ are stuck in a central location that is flanked on all sides.
  - All real players in team 1
  - All AI players in team 2
  - Upto 4 players in each team.
+ - Huge map size
  
  - Raging barbs?
  - Lekmod?
