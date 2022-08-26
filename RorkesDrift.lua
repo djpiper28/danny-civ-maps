@@ -10,6 +10,7 @@
 ------------------------------------------------------------------------------
 
 include("HBMapGenerator");
+include("HBFractalWorld");
 include("HBFeatureGenerator");
 include("HBTerrainGenerator");
 include("MultilayeredFractal");
@@ -84,7 +85,7 @@ function GetMapScriptInfo()
 					"Strategic Balance With Coal & Aluminum",
 					"TXT_KEY_MAP_OPTION_RANDOM",
 				},
-				DefaultValue = 2,
+				DefaultValue = 1,
 				SortPriority = -95,
 			},
 
@@ -395,6 +396,21 @@ function StartPlotSystem()
 	if res == 6 then
 		res = 1 + Map.Rand(3, "Random Resources Option - Lua");
 	end
+	
+  local RegionalMethod = 3;
+
+	-- Get Resources setting input by user.
+	local res = Map.GetCustomOption(13)
+	local starts = Map.GetCustomOption(5)
+	--if starts == 7 then
+		--starts = 1 + Map.Rand(8, "Random Resources Option - Lua");
+	--end
+
+	-- Handle coastal spawns and start bias
+	MixedBias = false;
+	BalancedCoastal = false;
+	OnlyCoastal = false;
+	CoastLux = false;
 
 	print("Creating start plot database.");
 	local start_plot_database = AssignStartingPlots.Create()
@@ -402,7 +418,12 @@ function StartPlotSystem()
 	print("Dividing the map in to Regions.");
 	local args = {
 		method = 2,
+		start_locations = starts,
 		resources = res,
+		CoastLux = CoastLux,
+		NoCoastInland = OnlyCoastal,
+		BalancedCoastal = BalancedCoastal,
+		MixedBias = MixedBias;
 		};
 	start_plot_database:GenerateRegions(args)
 
