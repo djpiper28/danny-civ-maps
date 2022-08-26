@@ -5,7 +5,6 @@
 --	         "inverse" four corners map that is plus shaped. There are four
 --	         "loot" islands in the corners for fun with hilly land bridges for
 --	         the ai to use. See README.md
---           Requires Lekmap and, Lekmod.
 ------------------------------------------------------------------------------
 --	Copyright (c) 2022 Danny Piper, AGPL3
 ------------------------------------------------------------------------------
@@ -26,139 +25,39 @@ function GetMapScriptInfo()
 		Description = "See danny-civ-maps README.md",
 		SupportsMultiplayer = true,
 		IconIndex = 8,
-    CustomOptions = {
+		CustomOptions = {world_age, temperature, rainfall,
 			{
-				Name = "TXT_KEY_MAP_OPTION_WORLD_AGE", -- 1
+				Name = "TXT_KEY_MAP_OPTION_RESOURCES",	-- Customizing the Resource setting to Default to Strategic Balance.
 				Values = {
-					"TXT_KEY_MAP_OPTION_THREE_BILLION_YEARS",
-					"TXT_KEY_MAP_OPTION_FOUR_BILLION_YEARS",
-					"TXT_KEY_MAP_OPTION_FIVE_BILLION_YEARS",
-					"No Mountains",
-					"TXT_KEY_MAP_OPTION_RANDOM",
-				},
-				DefaultValue = 2,
-				SortPriority = -99,
-			},
-
-			{
-				Name = "TXT_KEY_MAP_OPTION_TEMPERATURE",	-- 2 add temperature defaults to random
-				Values = {
-					"TXT_KEY_MAP_OPTION_COOL",
-					"TXT_KEY_MAP_OPTION_TEMPERATE",
-					"TXT_KEY_MAP_OPTION_HOT",
-					"TXT_KEY_MAP_OPTION_RANDOM",
-				},
-				DefaultValue = 2,
-				SortPriority = -98,
-			},
-
-			{
-				Name = "TXT_KEY_MAP_OPTION_RAINFALL",	-- 3 add rainfall defaults to random
-				Values = {
-					"TXT_KEY_MAP_OPTION_ARID",
-					"TXT_KEY_MAP_OPTION_NORMAL",
-					"TXT_KEY_MAP_OPTION_WET",
-					"TXT_KEY_MAP_OPTION_RANDOM",
-				},
-				DefaultValue = 2,
-				SortPriority = -97,
-			},
-
-			{
-				Name = "TXT_KEY_MAP_OPTION_SEA_LEVEL",	-- 4 add sea level defaults to random.
-				Values = {
-					"TXT_KEY_MAP_OPTION_LOW",
-					"TXT_KEY_MAP_OPTION_MEDIUM",
-					"TXT_KEY_MAP_OPTION_HIGH",
-					"TXT_KEY_MAP_OPTION_RANDOM",
-				},
-				DefaultValue = 2,
-				SortPriority = -96,
-			},
-
-			{
-				Name = "Start Quality",	-- 5 add resources defaults to random
-				Values = {
-					"Legendary Start - Strat Balance",
-					"Legendary - Strat Balance + Uranium",
+					"TXT_KEY_MAP_OPTION_SPARSE",
+					"TXT_KEY_MAP_OPTION_STANDARD",
+					"TXT_KEY_MAP_OPTION_ABUNDANT",
+					"TXT_KEY_MAP_OPTION_LEGENDARY_START",
 					"TXT_KEY_MAP_OPTION_STRATEGIC_BALANCE",
-					"Strategic Balance With Coal",
-					"Strategic Balance With Aluminum",
-					"Strategic Balance With Coal & Aluminum",
 					"TXT_KEY_MAP_OPTION_RANDOM",
 				},
-				DefaultValue = 2,
+				DefaultValue = 5,
 				SortPriority = -95,
 			},
-
 			{
-				Name = "Start Distance",	-- 6 add resources defaults to random
+				Name = "TXT_KEY_MAP_OPTION_BUFFER_ZONES",
 				Values = {
-					"Close",
-					"Normal",
-					"Far - Warning: May sometimes crash during map generation",
+					"TXT_KEY_MAP_OPTION_OCEAN",
+					"TXT_KEY_MAP_OPTION_MOUNTAINS",
+					"TXT_KEY_MAP_OPTION_RANDOM",
 				},
-				DefaultValue = 2,
-				SortPriority = -94,
+				DefaultValue = 1,
+				SortPriority = 1,
 			},
-
 			{
-				Name = "Natural Wonders", -- 7 number of natural wonders to spawn
+				Name = "TXT_KEY_MAP_OPTION_TEAM_SETTING",
 				Values = {
-					"0",
-					"1",
-					"2",
-					"3",
-					"4",
-					"5",
-					"6",
-					"7",
-					"8",
-					"9",
-					"10",
-					"11",
-					"12",
-					"Random",
-					"Default",
+					"TXT_KEY_MAP_OPTION_START_TOGETHER",
+					"TXT_KEY_MAP_OPTION_START_SEPERATED",
+					"TXT_KEY_MAP_OPTION_START_ANYWHERE",
 				},
-				DefaultValue = 15,
-				SortPriority = -93,
-			},
-
-			{
-				Name = "Grass Moisture",	-- add setting for grassland mositure (8)
-				Values = {
-					"Wet",
-					"Normal",
-					"Dry",
-				},
-
-				DefaultValue = 2,
-				SortPriority = -92,
-			},
-
-			{
-				Name = "Rivers",	-- add setting for rivers (9)
-				Values = {
-					"Sparse",
-					"Average",
-					"Plentiful",
-				},
-
-				DefaultValue = 2,
-				SortPriority = -91,
-			},
-
-			{
-				Name = "Tundra",	-- add setting for tundra (10)
-				Values = {
-					"Sparse",
-					"Average",
-					"Plentiful",
-				},
-
-				DefaultValue = 2,
-				SortPriority = -90,
+				DefaultValue = 1,
+				SortPriority = 2,
 			},
 		},
 	}
@@ -271,37 +170,14 @@ function MultilayeredFractal:GeneratePlotsByRegion()
 end
 ------------------------------------------------------------------------------
 function GeneratePlotTypes()
-	print("Generating Plot Types (Lua Archipelago) ...");
+	print("Setting Plot Types (Lua Four Corners) ...");
 
-	-- Fetch Sea Level and World Age user selections.
-	local sea = Map.GetCustomOption(4)
-	if sea == 4 then
-		sea = 1 + Map.Rand(3, "Random Sea Level - Lua");
-	end
-	local age = Map.GetCustomOption(1)
-	if age == 4 then
-		age = 1 + Map.Rand(3, "Random World Age - Lua");
-	end
+	local layered_world = MultilayeredFractal.Create();
+	local plot_list = layered_world:GeneratePlotsByRegion();
 
-	local fractal_world = FractalWorld.Create();
-	fractal_world:InitFractal{
-		continent_grain = 4};
+	SetPlotTypes(plot_list);
 
-	local args = {
-		sea_level = sea,
-		world_age = age,
-		sea_level_low = 72,
-		sea_level_normal = 78,
-		sea_level_high = 83,
-		extra_mountains = 10,
-		adjust_plates = 2,
-		tectonic_islands = true
-		}
-	local plotTypes = fractal_world:GeneratePlotTypes(args);
-	
-	SetPlotTypes(plotTypes);
-
-	local args = {expansion_diceroll_table = {10, 4, 4}};
+	local args = {bExpandCoasts = false};
 	GenerateCoasts(args);
 end
 ----------------------------------------------------------------------------------
@@ -315,8 +191,8 @@ function TerrainGenerator:GetLatitudeAtPlot(iX, iY)
 end
 ----------------------------------------------------------------------------------
 function GenerateTerrain()
-	print("Generating Terrain (Lua West vs East) ...");
-	
+	print("Generating Terrain (Lua Four Corners) ...");
+
 	-- Get Temperature setting input by user.
 	local temp = Map.GetCustomOption(2)
 	if temp == 4 then
@@ -327,7 +203,7 @@ function GenerateTerrain()
 	local terraingen = TerrainGenerator.Create(args);
 
 	terrainTypes = terraingen:GenerateTerrain();
-	
+
 	SetTerrainTypes(terrainTypes);
 end
 ------------------------------------------------------------------------------
@@ -614,7 +490,7 @@ function AddFeatures()
 	local args = {rainfall = rain}
 	local featuregen = FeatureGenerator.Create(args);
 
-	featuregen:AddFeatures(false);
+	featuregen:AddFeatures();
 end
 ------------------------------------------------------------------------------
 
@@ -711,8 +587,8 @@ function AssignStartingPlots:BalanceAndAssign()
     i = i + 1;
   end
 
-  local outer_offset_x = (iW / 2.0) - (offset);
-  local outer_offset_y = (iH / 2.0) - (offset);
+  local outer_offset_x = (iW / 2) - offset;
+  local outer_offset_y = (iH / 2) - offset;
   local j = 1;
   for loop, player_ID in ipairs(outerListShuffled) do
     local x = self.startingPlots[loop + i][1];
@@ -752,16 +628,10 @@ function StartPlotSystem()
 	print("Dividing the map in to Regions.");
 	-- Regional Division Method 2: Continental
 	local args = {
-		method = RegionalMethod,
-		start_locations = starts,
+		method = 2,
 		resources = res,
-		CoastLux = CoastLux,
-		NoCoastInland = OnlyCoastal,
-		BalancedCoastal = BalancedCoastal,
-		MixedBias = MixedBias;
 		};
-	start_plot_database:GenerateRegions(args)
-	AddGoodies();
+	start_plot_database:GenerateRegions()
 
 	print("Choosing start locations for civilizations.");
 	start_plot_database:ChooseLocations()
@@ -776,29 +646,10 @@ function StartPlotSystem()
 	start_plot_database:BalanceAndAssign()
 
 	print("Placing Natural Wonders.");
-	local wonders = Map.GetCustomOption(7)
-	if wonders == 14 then
-		wonders = Map.Rand(13, "Number of Wonders To Spawn - Lua");
-	else
-		wonders = wonders - 1;
-	end
-
-	print("########## Wonders ##########");
-	print("Natural Wonders To Place: ", wonders);
-
-	local wonderargs = {
-		wonderamt = wonders,
-	};
-	start_plot_database:PlaceNaturalWonders(wonderargs);
+	start_plot_database:PlaceNaturalWonders()
 
 	print("Placing Resources and City States.");
 	start_plot_database:PlaceResourcesAndCityStates()
-
-	-- tell the AI that we should treat this as a naval expansion map
-	Map.ChangeAIMapHint(1+4);
-	if (PreGame.IsMultiplayerGame()) then
-    	Network.SendChat("[COLOR_POSITIVE_TEXT]Lekmap v3.3[ENDCOLOR]", -1, -1);
-      Network.SendChar("[COLOR_POSITIVE_TEXT]Danny Map v1.0[ENDCOLOR]", -1, -1);
-	end
 end
 ------------------------------------------------------------------------------
+
