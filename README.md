@@ -12,7 +12,8 @@ This map is designed for a PVE experience where the players have to defend again
 are stuck in a central location that is flanked on all sides.
  - All real players in team 1
  - All AI players in team 2
- - Upto 4 players in each team.
+ - Up to 4 real players
+ - There must be exactly 4 players in the AI team.
  - Huge map size
  
  - Raging barbs?
