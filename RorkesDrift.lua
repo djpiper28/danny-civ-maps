@@ -191,7 +191,7 @@ end
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-function MultilayeredFractal:GeneratePlotsByRegion()
+function MultilayeredFractal:GeneratePlotsByRegion(args)
 	-- Sirian's MultilayeredFractal controlling function.
 	-- You -MUST- customize this function for each script using MultilayeredFractal.
 	--
@@ -244,26 +244,6 @@ function MultilayeredFractal:GeneratePlotsByRegion()
 	end
 	local args = {world_age = world_age};
 	self:ApplyTectonics(args)
-
-	-- If buffer zones are set to Mountains, add those now. (Must come after Tectonics layer to avoid being overwritten.)
-	local buffer_setting = Map.GetCustomOption(5)
-	if buffer_setting == 3 then
-		buffer_setting = 1 + Map.Rand(2, "Random Buffer Zone Type - Four Corners, Lua");
-	end
-	if buffer_setting == 2 then -- Apply mountains.
-		for y = 0, iH - 1 do
-			for x = math.floor(iW / 2) - 2, math.floor(iW / 2) + 1 do
-				local plotIndex = y * iW + x + 1;
-				self.wholeworldPlotTypes[plotIndex] = PlotTypes.PLOT_MOUNTAIN;
-			end
-		end
-		for x = 0, iW - 1 do
-			for y = math.floor(iH / 2) - 2, math.floor(iH / 2) + 1 do
-				local plotIndex = y * iW + x + 1;
-				self.wholeworldPlotTypes[plotIndex] = PlotTypes.PLOT_MOUNTAIN;
-			end
-		end
-	end
 
 	-- Plot Type generation completed. Return global plot array.
 	return self.wholeworldPlotTypes
@@ -430,8 +410,8 @@ function AssignStartingPlots:BalanceAndAssign()
   local outer_offset_y = (iH / 2) - offset;
   local j = 1;
   for loop, player_ID in ipairs(outerListShuffled) do
-    local x = self.startingPlots[loop + i][1];
-    local y = self.startingPlots[loop + i][2];
+    local x = self.startingPlots[loop + i - 1][1];
+    local y = self.startingPlots[loop + i - 1][2];
     if j <= 4 then
       x = math.floor((iW / 2.0) + (outer_offset_x * math.cos((math.pi * 2.0 * j) / 4)))
       y = math.floor((iH / 2.0) + (outer_offset_y * math.sin((math.pi * 2.0 * j) / 4)))
@@ -465,12 +445,16 @@ function StartPlotSystem()
 	local start_plot_database = AssignStartingPlots.Create()
 
 	print("Dividing the map in to Regions.");
-	-- Regional Division Method 2: Continental
 	local args = {
-		method = 2,
+		method = RegionalMethod,
+		start_locations = starts,
 		resources = res,
+		CoastLux = CoastLux,
+		NoCoastInland = OnlyCoastal,
+		BalancedCoastal = BalancedCoastal,
+		MixedBias = MixedBias;
 		};
-	start_plot_database:GenerateRegions()
+	start_plot_database:GenerateRegions(args)
 
 	print("Choosing start locations for civilizations.");
 	start_plot_database:ChooseLocations()
