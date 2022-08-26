@@ -9,13 +9,11 @@
 --	Copyright (c) 2022 Danny Piper, AGPL3
 ------------------------------------------------------------------------------
 
-include("MapGenerator");
-include("MultilayeredFractal");
-include("FeatureGenerator");
-include("TerrainGenerator");
 include("HBMapGenerator");
 include("HBFeatureGenerator");
 include("HBTerrainGenerator");
+include("MultilayeredFractal");
+include("IslandMaker");
 
 ------------------------------------------------------------------------------
 function GetMapScriptInfo()
@@ -261,8 +259,6 @@ function GeneratePlotTypes()
 	GenerateCoasts(args);
 end
 ----------------------------------------------------------------------------------
-
-----------------------------------------------------------------------------------
 function TerrainGenerator:GetLatitudeAtPlot(iX, iY)
 	local lat = math.abs((self.iHeight / 2) - iY) / (self.iHeight / 2);
 	lat = lat + (128 - self.variation:GetHeight(iX, iY))/(255.0 * 5.0);
@@ -310,47 +306,6 @@ function AddFeatures()
 	local featuregen = FeatureGenerator.Create(args);
 
 	featuregen:AddFeatures();
-end
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-function AssignStartingPlots:CanPlaceCityStateAt(x, y, area_ID, force_it, ignore_collisions)
-	-- Overriding default city state placement to prevent city states from being placed too close to map edges.
-	local iW, iH = Map.GetGridSize();
-	local plot = Map.GetPlot(x, y)
-	local area = plot:GetArea()
-
-	-- Adding this check for Four Corners
-	if x < 1 or x >= iW - 1 or y < 1 or y >= iH - 1 then
-		return false
-	end
-
-  -- Do not plot in the middle
-  local offset = 7;
-  if x > (iW / 2) - offset and x < (iW / 2) + offset and y > (iH / 2) - offset or x < (iH / 2) + offset then
-    return false
-  end
-
-	if area ~= area_ID and area_ID ~= -1 then
-		return false
-	end
-	local plotType = plot:GetPlotType()
-	if plotType == PlotTypes.PLOT_OCEAN or plotType == PlotTypes.PLOT_MOUNTAIN then
-		return false
-	end
-	local terrainType = plot:GetTerrainType()
-	if terrainType == TerrainTypes.TERRAIN_SNOW then
-		return false
-	end
-	local plotIndex = y * iW + x + 1;
-	if self.cityStateData[plotIndex] > 0 and force_it == false then
-		return false
-	end
-	local plotIndex = y * iW + x + 1;
-	if self.playerCollisionData[plotIndex] == true and ignore_collisions == false then
-		return false
-	end
-	return true
 end
 ------------------------------------------------------------------------------
 function AssignStartingPlots:BalanceAndAssign()
@@ -446,13 +401,8 @@ function StartPlotSystem()
 
 	print("Dividing the map in to Regions.");
 	local args = {
-		method = RegionalMethod,
-		start_locations = starts,
+		method = 2,
 		resources = res,
-		CoastLux = CoastLux,
-		NoCoastInland = OnlyCoastal,
-		BalancedCoastal = BalancedCoastal,
-		MixedBias = MixedBias;
 		};
 	start_plot_database:GenerateRegions(args)
 
@@ -489,7 +439,7 @@ function StartPlotSystem()
 	Map.ChangeAIMapHint(1+4);
 	if (PreGame.IsMultiplayerGame()) then
     	Network.SendChat("[COLOR_POSITIVE_TEXT]Lekmap v3.3[ENDCOLOR]", -1, -1);
-      Network.SendChar("[COLOR_POSITIVE_TEXT]Danny Map v1.0[ENDCOLOR]", -1, -1);
+      Network.SendChat("[COLOR_POSITIVE_TEXT]Danny Map v1.0[ENDCOLOR]", -1, -1);
 	end
 end
 ------------------------------------------------------------------------------
