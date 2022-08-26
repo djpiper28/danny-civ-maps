@@ -70,11 +70,11 @@ function GetMapInitData(worldSize)
 	--
 	-- North vs South is an extremely compact multiplayer map type.
 	local worldsizes = {
-		[GameInfo.Worlds.WORLDSIZE_DUEL.ID] = {16, 16},
-		[GameInfo.Worlds.WORLDSIZE_TINY.ID] = {24, 24},
-		[GameInfo.Worlds.WORLDSIZE_SMALL.ID] = {30, 30},
-		[GameInfo.Worlds.WORLDSIZE_STANDARD.ID] = {36, 36},
-		[GameInfo.Worlds.WORLDSIZE_LARGE.ID] = {44, 44},
+		[GameInfo.Worlds.WORLDSIZE_DUEL.ID] = {56, 56},
+		[GameInfo.Worlds.WORLDSIZE_TINY.ID] = {56, 56},
+		[GameInfo.Worlds.WORLDSIZE_SMALL.ID] = {56, 56},
+		[GameInfo.Worlds.WORLDSIZE_STANDARD.ID] = {56, 56},
+		[GameInfo.Worlds.WORLDSIZE_LARGE.ID] = {56, 56},
 		[GameInfo.Worlds.WORLDSIZE_HUGE.ID] = {56, 56}
 		}
 	local grid_size = worldsizes[worldSize];
@@ -99,6 +99,7 @@ function MultilayeredFractal:GeneratePlotsByRegion()
 	local iW, iH = Map.GetGridSize();
 	local fracFlags = {};
   local offset = 7;
+  local islandSize = offset + 5;
   local xMin = (iW / 2) - offset;
   local xMax = (iW / 2) + offset;
   local yMin = (iH / 2) - offset;
@@ -127,8 +128,8 @@ function MultilayeredFractal:GeneratePlotsByRegion()
   print("Adding loot island tm.");
 	for x = 0, iW - 1 do
 		for y = 0, iH - 1 do
-      if x < offset or x > iW - offset then
-        if y < offset or y > iH - offset then
+      if x < 2 * islandSize or x > iW - islandSize then
+        if y < 2 * islandSize or y > iH - islandSize then
     			local plotIndex = y * iW + x + 1;
   			  self.wholeworldPlotTypes[plotIndex] = PlotTypes.PLOT_LAND;
         end
@@ -585,22 +586,20 @@ function AssignStartingPlots:BalanceAndAssign()
     player:SetStartingPlot(start_plot)
     i = i + 1;
   end
+
+  local outer_offset_x = (iW / 2) - (2 * offset);
+  local outer_offset_y = (iH / 2) - (2 * offset);
+  local j = 1;
   for loop, player_ID in ipairs(outerListShuffled) do
-    local x = self.startingPlots[loop + i][1];
-    local y = self.startingPlots[loop + i][2];
+    local x = math.floor((iW / 2.0) + (outer_offset_x * math.cos((math.pi * 2.0 * j) / middleLen)))
+    local y = math.floor((iH / 2.0) + (outer_offset_y * math.sin((math.pi * 2.0 * j) / middleLen)))
+    assert(not (x >= xMin and x <= xMax and y >= yMin and y <= yMax), "Illegal coords");
 
     -- Clip enemies to outside the middle
-    if x > xMin and x < xMax and y > yMin and y < yMax then
-      x = xMin - (loop + 2 * offset);
-      y = iH / 2;
-      print("Clipped a player to stop them being in the wrong place");
-    end;
-    assert(x >= 0 and x < iW, "Illegal x");
-    assert(y >= 0 and y < iW, "Illegal y");
-
     local start_plot = Map.GetPlot(x, y)
     local player = Players[player_ID]
     player:SetStartingPlot(start_plot)
+    j = j + 1;
   end
 end
 ------------------------------------------------------------------------------
