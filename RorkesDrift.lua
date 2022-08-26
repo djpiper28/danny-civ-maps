@@ -591,11 +591,23 @@ function AssignStartingPlots:BalanceAndAssign()
   local outer_offset_y = (iH / 2) - (2 * offset);
   local j = 1;
   for loop, player_ID in ipairs(outerListShuffled) do
-    local x = math.floor((iW / 2.0) + (outer_offset_x * math.cos((math.pi * 2.0 * j) / middleLen)))
-    local y = math.floor((iH / 2.0) + (outer_offset_y * math.sin((math.pi * 2.0 * j) / middleLen)))
-    assert(not (x >= xMin and x <= xMax and y >= yMin and y <= yMax), "Illegal coords");
+    local x = self.startingPlots[loop + i][1];
+    local y = self.startingPlots[loop + i][2];
+    if j <= 4 then
+      x = math.floor((iW / 2.0) + (outer_offset_x * math.cos((math.pi * 2.0 * j) / 4)))
+      y = math.floor((iH / 2.0) + (outer_offset_y * math.sin((math.pi * 2.0 * j) / 4)))
+      assert(not (x >= xMin and x <= xMax and y >= yMin and y <= yMax), "Illegal coords");
+    end
 
     -- Clip enemies to outside the middle
+    if x > xMin and x < xMax and y > yMin and y < yMax then
+      x = xMin - (loop + 2 * offset);
+      y = iH / 2;
+      print("Clipped a player to stop them being in the wrong place");
+    end;
+    assert(x >= 0 and x < iW, "Illegal x");
+    assert(y >= 0 and y < iW, "Illegal y");
+
     local start_plot = Map.GetPlot(x, y)
     local player = Players[player_ID]
     player:SetStartingPlot(start_plot)
