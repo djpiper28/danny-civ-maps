@@ -1,6 +1,8 @@
 # Danny's Civ V Maps
 ## Installation 
-Note: **Requires Lekmap**
+Note:
+ - **Requires Lekmap**
+ - You might want to intall lekmod
 
 Place into `Assets/Maps/Lekamp xxxx`. All players must do this.
 
@@ -13,9 +15,9 @@ are stuck in a central location that is flanked on all sides.
  - All real players in team 1
  - All AI players in team 2
  - Up to 4 real players
- - There must be exactly 4 players in the AI team.
+ - Up to 4 AI players, you can add more but they might get insta killed
  - Huge map size
  
  - Raging barbs?
- - Lekmod?
+ - AI on diety?
  - One city challenge?
