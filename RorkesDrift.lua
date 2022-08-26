@@ -551,6 +551,7 @@ function AssignStartingPlots:BalanceAndAssign()
   -- Place the lowest team in the middle, scatter the rest on the main island, at least 2 offset aw
   print("-"); print("This is a team game with two teams, place one in the middle, then scatter the rest."); print("-");
   local outerList, middleList = {}, {};
+  local middleLen = 0;
   for loop = 1, self.iNumCivs do
     local player_ID = self.player_ID_list[loop];
     local player = Players[player_ID];
@@ -558,6 +559,7 @@ function AssignStartingPlots:BalanceAndAssign()
     if team_ID == teamMiddleID then
       print("Player #", player_ID, "belongs to Team #", team_ID, "and will be placed in the middle.");
       table.insert(middleList, player_ID);
+      middleLen = middleLen + 1;
     else
       print("Player #", player_ID, "belongs to Team #", team_ID, "and will be placed in the outer.");
       table.insert(outerList, player_ID);
@@ -570,8 +572,8 @@ function AssignStartingPlots:BalanceAndAssign()
   local i = 1
   for region_number, player_ID in ipairs(middleListShuffled) do
     -- Scatter the players in team 1 around the middle in a circle
-    local x = math.floor((iW / 2.0) + (offset * math.cos((math.pi * 2.0) / i)))
-    local y = math.floor((iH / 2.0) + (offset * math.sin((math.pi * 2.0) / i)))
+    local x = math.floor((iW / 2.0) + (offset * math.cos((math.pi * 2.0 * i) / middleLen)))
+    local y = math.floor((iH / 2.0) + (offset * math.sin((math.pi * 2.0 * i) / middleLen)))
     assert(x >= xMin and x <= xMax, "Illegal x");
     assert(y >= yMin and y <= yMax, "Illegal y");
 
@@ -586,7 +588,7 @@ function AssignStartingPlots:BalanceAndAssign()
 
     -- Clip enemies to outside the middle
     if x > xMin and x < xMax and y > yMin and y < yMax then
-      x = xMin - 2 * offset;
+      x = xMin - (loop + 2 * offset);
       y = iH / 2;
       print("Clipped a player to stop them being in the wrong place");
     end;
