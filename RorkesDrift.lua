@@ -13,6 +13,9 @@ include("MapGenerator");
 include("MultilayeredFractal");
 include("FeatureGenerator");
 include("TerrainGenerator");
+include("HBMapGenerator");
+include("HBFeatureGenerator");
+include("HBTerrainGenerator");
 
 ------------------------------------------------------------------------------
 function GetMapScriptInfo()
