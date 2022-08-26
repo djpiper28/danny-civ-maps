@@ -1,6 +1,8 @@
 # Danny's Civ V Maps
 ## Installation 
-Place into `Assets/Maps`, make a new folder in there if you want to. All players must do it.
+Note: **Requires Lekmap**
+
+Place into `Assets/Maps/Lekamp xxxx`. All players must do this.
 
 ## Debugging
 Send me your `My Documents/My Games/Civ V or whatever it is called/Log/Lua.log`
