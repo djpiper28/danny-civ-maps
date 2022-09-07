@@ -456,10 +456,5 @@ function StartPlotSystem()
 
 	print("Placing Resources and City States.")
 	start_plot_database:PlaceResourcesAndCityStates()
-
-	if PreGame.IsMultiplayerGame() then
-		Network.SendChat("[COLOR_POSITIVE_TEXT]Lekmap v3.3[ENDCOLOR]", -1, -1)
-		Network.SendChat("[COLOR_POSITIVE_TEXT]Danny Map v1.0[ENDCOLOR]", -1, -1)
-	end
 end
 ------------------------------------------------------------------------------
